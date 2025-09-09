@@ -3,6 +3,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { FlatList, Image, Platform, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 /* ------------------- DADOS DE EXEMPLO ------------------- */
+import abelChivukuvuku from "../assets/images/abelchivucuvucu.jpeg";
+import adalberto from "../assets/images/aldabertocostajunior.jpg";
+import fnlaIcon from "../assets/images/fnla.png";
+import joaoLourenco from "../assets/images/joaolourenco.jpeg";
+import lucasNgonda from "../assets/images/lucasngonda.jpeg";
+import mplaIcon from "../assets/images/mpla.png";
+import prajaIcon from "../assets/images/prajaservirangola.png";
+import unitaIcon from "../assets/images/unita.png";
+import BandeiraAngolaIcon from "../assets/images/bandeira_angola.png";
 const CANDIDATOS = [
   {
     id: "c1",
@@ -11,8 +20,10 @@ const CANDIDATOS = [
     sigla: "MPLA",
     partidoColor: "#FF0000",
     votos: 1250,
-    foto: "https://i.pravatar.cc/150?img=12",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/7/7b/MPLA_logo.png",
+    foto: joaoLourenco,
+    icon: mplaIcon,
+    objetivo:
+      "Promover a estabilidade, crescimento económico e investimentos em infraestrutura.",
   },
   {
     id: "c2",
@@ -21,8 +32,10 @@ const CANDIDATOS = [
     sigla: "UNITA",
     partidoColor: "#008000",
     votos: 24000,
-    foto: "https://i.pravatar.cc/150?img=47",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/1/1b/UNITA_logo.png",
+    foto: adalberto,
+    icon: unitaIcon,
+    objetivo:
+      "Defender a democracia, criar empregos e melhorar a qualidade da educação e saúde.",
   },
   {
     id: "c3",
@@ -31,8 +44,10 @@ const CANDIDATOS = [
     sigla: "FNLA",
     partidoColor: "#0000FF",
     votos: 900000,
-    foto: "https://i.pravatar.cc/150?img=5",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/c/c7/FNLA_logo.png",
+    foto: lucasNgonda,
+    icon: fnlaIcon,
+    objetivo:
+      "Unir o país e garantir maior inclusão social e desenvolvimento comunitário.",
   },
   {
     id: "c4",
@@ -41,8 +56,10 @@ const CANDIDATOS = [
     sigla: "PRA-JÁ",
     partidoColor: "#800080",
     votos: 0,
-    foto: "https://i.pravatar.cc/150?img=30",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/3/3f/FRENTE_logo.png",
+    foto: abelChivukuvuku,
+    icon: prajaIcon,
+    objetivo:
+      "Construir um futuro de esperança, justiça social e desenvolvimento inclusivo para todos os angolanos.",
   },
 ];
 
@@ -54,6 +71,7 @@ const formatarVotos = (num: number) => {
   return num.toString();
 };
 
+/* ------------------- COMPONENTE ------------------- */
 export default function Resultados() {
   const [candidatos, setCandidatos] = useState(CANDIDATOS);
   const [timeLeft, setTimeLeft] = useState({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
@@ -64,12 +82,8 @@ export default function Resultados() {
     [candidatos]
   );
 
-  // Identifica o vencedor
   const vencedor = useMemo(() => {
-    return candidatos.reduce(
-      (prev, curr) => (curr.votos > prev.votos ? curr : prev),
-      candidatos[0]
-    );
+    return candidatos.reduce((prev, curr) => (curr.votos > prev.votos ? curr : prev), candidatos[0]);
   }, [candidatos]);
 
   useEffect(() => {
@@ -97,24 +111,24 @@ export default function Resultados() {
   }, []);
 
   if (votacaoEncerrada) {
-    // Tela de vencedor com bandeira de Angola
     return (
       <SafeAreaView style={styles.winnerPage}>
-        <Text style={styles.winnerTitle}>Eleição Encerrada</Text>
-        <Text style={styles.winnerSubtitle}>Vencedor da Eleição</Text>
-
-        <Image
-          source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Angola.svg" }}
+         <Image
+          source={BandeiraAngolaIcon}
           style={styles.flag}
           resizeMode="contain"
         />
+        <Text style={styles.winnerTitle}>Eleição Encerrada</Text>
+        <Text style={styles.winnerSubtitle}>Vencedor da Eleição</Text>
+
+       
 
         <View style={styles.winnerCard}>
-          <Image source={{ uri: vencedor.foto }} style={styles.winnerAvatar} />
+          <Image source={vencedor.foto} style={styles.winnerAvatar} resizeMode="cover" />
           <View style={{ flex: 1, marginLeft: 16 }}>
             <Text style={styles.winnerName}>{vencedor.nome}</Text>
             <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 6 }}>
-              <Image source={{ uri: vencedor.icon }} style={styles.icon} />
+              <Image source={vencedor.icon} style={styles.icon} resizeMode="contain" />
               <Text style={styles.winnerPartido}>{vencedor.partido}</Text>
             </View>
             <Text style={styles.governacao}>Mandato: 2025 - 2030</Text>
@@ -131,7 +145,7 @@ export default function Resultados() {
     const percent = totalVotos > 0 ? Math.round((item.votos / totalVotos) * 100) : 0;
     return (
       <View style={styles.card}>
-        <Image source={{ uri: item.foto }} style={styles.avatar} />
+        <Image source={item.foto} style={styles.avatar} resizeMode="cover" />
         <View style={{ flex: 1, marginLeft: 12 }}>
           <Text style={styles.nome}>{item.nome}</Text>
           <Text style={styles.partido}>{item.partido}</Text>
@@ -170,6 +184,7 @@ export default function Resultados() {
   );
 }
 
+/* ------------------- ESTILOS ------------------- */
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#F7F7F8", paddingTop: Platform.OS === "android" ? 24 : 0 },
   title: { fontSize: 22, fontWeight: "700", textAlign: "center", marginTop: 20, marginBottom: 4, color: "#111" },
@@ -186,7 +201,6 @@ const styles = StyleSheet.create({
   percentText: { position: "absolute", right: 8, top: -18, fontSize: 12, color: "#444", fontWeight: "600" },
   votosText: { fontSize: 14, fontWeight: "700", color: "#111" },
 
-  // Tela vencedor
   winnerPage: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#F0F4F8", padding: 20 },
   winnerTitle: { fontSize: 26, fontWeight: "800", color: "#111", marginBottom: 4 },
   winnerSubtitle: { fontSize: 16, fontWeight: "600", color: "#666", marginBottom: 16 },
