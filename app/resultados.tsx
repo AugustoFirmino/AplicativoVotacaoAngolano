@@ -1,54 +1,58 @@
 // app/resultados.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import { FlatList, Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, Platform, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
+/* ------------------- DADOS DE EXEMPLO ------------------- */
 const CANDIDATOS = [
   {
     id: "c1",
     nome: "João Manuel Gonçalves Lourenço",
-    partido: "MPLA",
+    partido: "Movimento Popular de Libertação de Angola",
+    sigla: "MPLA",
     partidoColor: "#FF0000",
-    votos: 125,
+    votos: 1250,
     foto: "https://i.pravatar.cc/150?img=12",
     icon: "https://upload.wikimedia.org/wikipedia/commons/7/7b/MPLA_logo.png",
   },
   {
     id: "c2",
     nome: "Adalberto da Costa Júnior",
-    partido: "UNITA",
+    partido: "União Nacional para a Independência Total de Angola",
+    sigla: "UNITA",
     partidoColor: "#008000",
-    votos: 240,
+    votos: 24000,
     foto: "https://i.pravatar.cc/150?img=47",
     icon: "https://upload.wikimedia.org/wikipedia/commons/1/1b/UNITA_logo.png",
   },
   {
     id: "c3",
     nome: "Lucas Ngonda",
-    partido: "FNLA",
+    partido: "Frente Nacional de Libertação de Angola",
+    sigla: "FNLA",
     partidoColor: "#0000FF",
-    votos: 90,
+    votos: 900000,
     foto: "https://i.pravatar.cc/150?img=5",
     icon: "https://upload.wikimedia.org/wikipedia/commons/c/c7/FNLA_logo.png",
   },
   {
     id: "c4",
-    nome: "Helena Cabral",
-    partido: "FRENTE",
-    partidoColor: "#FFD700",
-    votos: 45,
+    nome: "Abel Chivukuvuku",
+    partido: "Pra Já Servir Angola",
+    sigla: "PRA-JÁ",
+    partidoColor: "#800080",
+    votos: 0,
     foto: "https://i.pravatar.cc/150?img=30",
     icon: "https://upload.wikimedia.org/wikipedia/commons/3/3f/FRENTE_logo.png",
   },
-  {
-    id: "c5",
-    nome: "Carlos Silva",
-    partido: "PRS",
-    partidoColor: "#FF00FF",
-    votos: 60,
-    foto: "https://i.pravatar.cc/150?img=33",
-    icon: "https://upload.wikimedia.org/wikipedia/commons/5/5b/PRS_logo.png",
-  },
 ];
+
+/* ------------------- FUNÇÃO FORMATAR NÚMEROS ------------------- */
+const formatarVotos = (num: number) => {
+  if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B";
+  if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M";
+  if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
+  return num.toString();
+};
 
 export default function Resultados() {
   const [candidatos, setCandidatos] = useState(CANDIDATOS);
@@ -62,7 +66,10 @@ export default function Resultados() {
 
   // Identifica o vencedor
   const vencedor = useMemo(() => {
-    return candidatos.reduce((prev, curr) => (curr.votos > prev.votos ? curr : prev), candidatos[0]);
+    return candidatos.reduce(
+      (prev, curr) => (curr.votos > prev.votos ? curr : prev),
+      candidatos[0]
+    );
   }, [candidatos]);
 
   useEffect(() => {
@@ -90,11 +97,18 @@ export default function Resultados() {
   }, []);
 
   if (votacaoEncerrada) {
-    // Tela de vencedor
+    // Tela de vencedor com bandeira de Angola
     return (
       <SafeAreaView style={styles.winnerPage}>
         <Text style={styles.winnerTitle}>Eleição Encerrada</Text>
         <Text style={styles.winnerSubtitle}>Vencedor da Eleição</Text>
+
+        <Image
+          source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Angola.svg" }}
+          style={styles.flag}
+          resizeMode="contain"
+        />
+
         <View style={styles.winnerCard}>
           <Image source={{ uri: vencedor.foto }} style={styles.winnerAvatar} />
           <View style={{ flex: 1, marginLeft: 16 }}>
@@ -104,7 +118,9 @@ export default function Resultados() {
               <Text style={styles.winnerPartido}>{vencedor.partido}</Text>
             </View>
             <Text style={styles.governacao}>Mandato: 2025 - 2030</Text>
-            <Text style={styles.votosFinal}>Votos: {vencedor.votos} ({Math.round((vencedor.votos / totalVotos) * 100)}%)</Text>
+            <Text style={styles.votosFinal}>
+              Votos: {formatarVotos(vencedor.votos)} ({Math.round((vencedor.votos / totalVotos) * 100)}%)
+            </Text>
           </View>
         </View>
       </SafeAreaView>
@@ -120,11 +136,13 @@ export default function Resultados() {
           <Text style={styles.nome}>{item.nome}</Text>
           <Text style={styles.partido}>{item.partido}</Text>
           <View style={styles.progressWrap}>
-            <View style={[styles.progress, { width: `${percent}%`, backgroundColor: item.partidoColor }]} />
+            <View
+              style={[styles.progress, { width: `${percent}%`, backgroundColor: item.partidoColor }]}
+            />
             <Text style={styles.percentText}>{percent}%</Text>
           </View>
         </View>
-        <Text style={styles.votosText}>{item.votos} votos</Text>
+        <Text style={styles.votosText}>{formatarVotos(item.votos)} votos</Text>
       </View>
     );
   };
@@ -139,13 +157,13 @@ export default function Resultados() {
         </Text>
       </View>
 
-      <Text style={styles.subtitle}>Total de votos: {totalVotos}</Text>
+      <Text style={styles.subtitle}>Total de votos: {formatarVotos(totalVotos)}</Text>
 
       <FlatList
         data={candidatos}
         keyExtractor={(i) => i.id}
         renderItem={({ item }) => renderCandidato(item)}
-        contentContainerStyle={{ padding: 16 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
       />
     </SafeAreaView>
@@ -153,7 +171,7 @@ export default function Resultados() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: "#F7F7F8" },
+  page: { flex: 1, backgroundColor: "#F7F7F8", paddingTop: Platform.OS === "android" ? 24 : 0 },
   title: { fontSize: 22, fontWeight: "700", textAlign: "center", marginTop: 20, marginBottom: 4, color: "#111" },
   subtitle: { fontSize: 14, textAlign: "center", color: "#666", marginBottom: 12 },
   timerContainer: { backgroundColor: "#000", paddingVertical: 10, marginHorizontal: 20, borderRadius: 8, marginBottom: 12 },
@@ -171,7 +189,7 @@ const styles = StyleSheet.create({
   // Tela vencedor
   winnerPage: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#F0F4F8", padding: 20 },
   winnerTitle: { fontSize: 26, fontWeight: "800", color: "#111", marginBottom: 4 },
-  winnerSubtitle: { fontSize: 16, fontWeight: "600", color: "#666", marginBottom: 20 },
+  winnerSubtitle: { fontSize: 16, fontWeight: "600", color: "#666", marginBottom: 16 },
   winnerCard: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 16, padding: 20, alignItems: "center", shadowColor: "#000", shadowOpacity: 0.15, shadowOffset: { width: 0, height: 8 }, shadowRadius: 16, elevation: 5 },
   winnerAvatar: { width: 100, height: 100, borderRadius: 16 },
   icon: { width: 28, height: 28, marginRight: 8 },
@@ -179,4 +197,5 @@ const styles = StyleSheet.create({
   winnerPartido: { fontSize: 16, fontWeight: "600", color: "#444" },
   governacao: { fontSize: 14, color: "#666", marginTop: 4 },
   votosFinal: { fontSize: 16, fontWeight: "700", marginTop: 6, color: "#111" },
+  flag: { width: 120, height: 80, marginBottom: 16 },
 });
